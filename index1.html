@@ -1,0 +1,1110 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Meme Kanseri Tespiti — Derin Öğrenme Projesi</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0a1628;
+    --blue: #1565C0;
+    --blue-light: #1976D2;
+    --teal: #00897B;
+    --red: #E85D4A;
+    --green: #2E7D32;
+    --cream: #F8F6F0;
+    --warm-gray: #E8E4DC;
+    --text: #1a1a2e;
+    --text-light: #5a5a7a;
+    --border: #d8d4cc;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--text);
+    overflow-x: hidden;
+  }
+
+  /* HERO */
+  .hero {
+    background: var(--navy);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 80px 40px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -200px; right: -200px;
+    width: 600px; height: 600px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(21,101,192,0.3) 0%, transparent 70%);
+  }
+
+  .hero::after {
+    content: '';
+    position: absolute;
+    bottom: -150px; left: -150px;
+    width: 500px; height: 500px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(0,137,123,0.2) 0%, transparent 70%);
+  }
+
+  .hero-inner {
+    max-width: 900px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+  }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(21,101,192,0.3);
+    border: 1px solid rgba(21,101,192,0.5);
+    color: #90CAF9;
+    padding: 8px 16px;
+    border-radius: 100px;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    margin-bottom: 32px;
+  }
+
+  .hero-badge span { 
+    width: 8px; height: 8px; 
+    background: #4FC3F7; 
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(1.3); }
+  }
+
+  .hero h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(42px, 6vw, 80px);
+    color: #fff;
+    line-height: 1.05;
+    margin-bottom: 24px;
+  }
+
+  .hero h1 em {
+    font-style: italic;
+    color: #64B5F6;
+  }
+
+  .hero p {
+    font-size: 18px;
+    color: rgba(255,255,255,0.6);
+    max-width: 600px;
+    line-height: 1.7;
+    margin-bottom: 48px;
+  }
+
+  .hero-stats {
+    display: flex;
+    gap: 48px;
+    flex-wrap: wrap;
+  }
+
+  .stat {
+    border-left: 2px solid rgba(21,101,192,0.5);
+    padding-left: 16px;
+  }
+
+  .stat-num {
+    font-family: 'DM Serif Display', serif;
+    font-size: 36px;
+    color: #fff;
+    line-height: 1;
+  }
+
+  .stat-label {
+    font-size: 13px;
+    color: rgba(255,255,255,0.4);
+    margin-top: 4px;
+    letter-spacing: 0.5px;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    background: rgba(10,22,40,0.95);
+    backdrop-filter: blur(10px);
+    z-index: 100;
+    padding: 16px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+
+  .nav-logo {
+    font-family: 'DM Serif Display', serif;
+    color: #fff;
+    font-size: 18px;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 32px;
+    list-style: none;
+  }
+
+  .nav-links a {
+    color: rgba(255,255,255,0.5);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    transition: color 0.2s;
+  }
+
+  .nav-links a:hover { color: #fff; }
+
+  /* SECTIONS */
+  .section {
+    padding: 100px 40px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .section-tag {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--blue);
+    margin-bottom: 16px;
+  }
+
+  .section h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(32px, 4vw, 52px);
+    color: var(--navy);
+    line-height: 1.15;
+    margin-bottom: 20px;
+  }
+
+  .section-intro {
+    font-size: 17px;
+    color: var(--text-light);
+    max-width: 680px;
+    line-height: 1.75;
+    margin-bottom: 64px;
+  }
+
+  /* DIVIDER */
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 0 40px;
+  }
+
+  /* SORU 1 — VERİ SETİ */
+  .info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-bottom: 48px;
+  }
+
+  .info-card {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 32px;
+  }
+
+  .info-card-label {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--blue);
+    margin-bottom: 12px;
+  }
+
+  .info-card h3 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 22px;
+    color: var(--navy);
+    margin-bottom: 12px;
+  }
+
+  .info-card p {
+    font-size: 15px;
+    color: var(--text-light);
+    line-height: 1.7;
+  }
+
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+
+  .data-table th {
+    background: var(--navy);
+    color: #fff;
+    padding: 16px 24px;
+    text-align: left;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+  }
+
+  .data-table td {
+    padding: 14px 24px;
+    border-bottom: 1px solid var(--warm-gray);
+    font-size: 15px;
+    color: var(--text);
+  }
+
+  .data-table tr:last-child td { border-bottom: none; }
+  .data-table tr:nth-child(even) td { background: var(--cream); }
+
+  .highlight { color: var(--blue); font-weight: 600; }
+
+  /* CLASS BARS */
+  .class-bars {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 32px;
+  }
+
+  .class-bar {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+  }
+
+  .class-bar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+
+  .class-bar-label { font-size: 14px; font-weight: 600; color: var(--navy); }
+  .class-bar-count { font-size: 20px; font-weight: 700; }
+
+  .bar-track {
+    height: 8px;
+    background: var(--warm-gray);
+    border-radius: 100px;
+    overflow: hidden;
+  }
+
+  .bar-fill {
+    height: 100%;
+    border-radius: 100px;
+    transition: width 1s ease;
+  }
+
+  /* SORU 2 — MODEL */
+  .model-arch {
+    background: var(--navy);
+    border-radius: 24px;
+    padding: 48px;
+    color: #fff;
+    margin-bottom: 48px;
+  }
+
+  .model-arch h3 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 28px;
+    margin-bottom: 32px;
+    color: #fff;
+  }
+
+  .layers {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .layer {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 16px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+
+  .layer:last-child { border-bottom: none; }
+
+  .layer-icon {
+    width: 48px; height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+
+  .layer-info h4 { font-size: 15px; font-weight: 600; color: #fff; }
+  .layer-info p { font-size: 13px; color: rgba(255,255,255,0.45); margin-top: 2px; }
+
+  .layer-badge {
+    margin-left: auto;
+    background: rgba(255,255,255,0.1);
+    padding: 4px 12px;
+    border-radius: 100px;
+    font-size: 12px;
+    color: rgba(255,255,255,0.6);
+  }
+
+  .training-cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+
+  .training-card {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+    text-align: center;
+  }
+
+  .training-card-icon {
+    font-size: 32px;
+    margin-bottom: 12px;
+  }
+
+  .training-card h4 {
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--text-light);
+    margin-bottom: 8px;
+  }
+
+  .training-card p {
+    font-family: 'DM Serif Display', serif;
+    font-size: 22px;
+    color: var(--navy);
+  }
+
+  /* SORU 3 — PERFORMANS */
+  .metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    margin-bottom: 48px;
+  }
+
+  .metric-card {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px 20px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .metric-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+  }
+
+  .metric-card.blue::before { background: var(--blue); }
+  .metric-card.teal::before { background: var(--teal); }
+  .metric-card.red::before { background: var(--red); }
+  .metric-card.green::before { background: var(--green); }
+
+  .metric-name {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text-light);
+    margin-bottom: 12px;
+  }
+
+  .metric-value {
+    font-family: 'DM Serif Display', serif;
+    font-size: 42px;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .metric-card.blue .metric-value { color: var(--blue); }
+  .metric-card.teal .metric-value { color: var(--teal); }
+  .metric-card.red .metric-value { color: var(--red); }
+  .metric-card.green .metric-value { color: var(--green); }
+
+  .metric-desc { font-size: 12px; color: var(--text-light); }
+
+  .charts-note {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 40px;
+    text-align: center;
+    color: var(--text-light);
+  }
+
+  .charts-note p { font-size: 15px; line-height: 1.7; }
+  .charts-note strong { color: var(--navy); }
+
+  /* SORU 4 — MOBİL UYGULAMA */
+  .app-showcase {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 48px;
+    align-items: center;
+    margin-bottom: 64px;
+  }
+
+  .phone-mockup {
+    background: var(--navy);
+    border-radius: 40px;
+    padding: 16px;
+    box-shadow: 0 40px 80px rgba(0,0,0,0.2);
+    aspect-ratio: 9/19;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    max-width: 280px;
+    margin: 0 auto;
+  }
+
+  .phone-screen {
+    background: var(--cream);
+    border-radius: 28px;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .phone-appbar {
+    background: var(--blue);
+    padding: 16px;
+    text-align: center;
+    color: #fff;
+    font-weight: 600;
+    font-size: 13px;
+  }
+
+  .phone-body {
+    padding: 16px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .phone-info-box {
+    background: #E3F2FD;
+    border-radius: 10px;
+    padding: 12px;
+    text-align: center;
+    font-size: 10px;
+    color: var(--blue);
+    border: 1px solid rgba(21,101,192,0.3);
+  }
+
+  .phone-img-box {
+    background: #fff;
+    border-radius: 12px;
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--border);
+    font-size: 28px;
+  }
+
+  .phone-btns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .phone-btn {
+    background: var(--blue);
+    color: #fff;
+    border-radius: 8px;
+    padding: 10px;
+    text-align: center;
+    font-size: 10px;
+    font-weight: 600;
+  }
+
+  .phone-btn.light { background: #0288D1; }
+
+  .phone-result {
+    background: rgba(46,125,50,0.1);
+    border: 2px solid var(--green);
+    border-radius: 12px;
+    padding: 12px;
+    text-align: center;
+  }
+
+  .phone-result-text {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--green);
+  }
+
+  .phone-result-sub {
+    font-size: 9px;
+    color: var(--green);
+    opacity: 0.7;
+  }
+
+  .phone-nav {
+    background: #fff;
+    border-top: 1px solid var(--border);
+    padding: 10px;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    text-align: center;
+    font-size: 8px;
+    color: var(--text-light);
+    gap: 4px;
+  }
+
+  .phone-nav-item { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+  .phone-nav-item.active { color: var(--blue); }
+  .phone-nav-icon { font-size: 16px; }
+
+  .app-features {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .feature-item {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+  }
+
+  .feature-icon {
+    width: 48px; height: 48px;
+    background: var(--blue);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+  }
+
+  .feature-text h4 {
+    font-weight: 600;
+    font-size: 16px;
+    color: var(--navy);
+    margin-bottom: 4px;
+  }
+
+  .feature-text p {
+    font-size: 14px;
+    color: var(--text-light);
+    line-height: 1.6;
+  }
+
+  /* TECH STACK */
+  .tech-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+  }
+
+  .tech-card {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+  }
+
+  .tech-card-icon { font-size: 28px; margin-bottom: 8px; }
+  .tech-card h4 { font-size: 14px; font-weight: 600; color: var(--navy); }
+  .tech-card p { font-size: 12px; color: var(--text-light); margin-top: 4px; }
+
+  /* FOOTER */
+  footer {
+    background: var(--navy);
+    color: rgba(255,255,255,0.4);
+    text-align: center;
+    padding: 48px 40px;
+    font-size: 14px;
+  }
+
+  footer strong { color: rgba(255,255,255,0.8); }
+
+  /* SCROLL ANIMATIONS */
+  .fade-up {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+
+  .fade-up.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  @media (max-width: 768px) {
+    .info-grid, .training-cards, .metrics-grid, .tech-grid { grid-template-columns: 1fr 1fr; }
+    .app-showcase { grid-template-columns: 1fr; }
+    .class-bars { grid-template-columns: 1fr; }
+    nav { padding: 16px 20px; }
+    .nav-links { display: none; }
+    .section { padding: 60px 20px; }
+    .hero { padding: 100px 20px 60px; }
+    .hero-stats { gap: 24px; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">IDC Tespit Sistemi</div>
+  <ul class="nav-links">
+    <li><a href="#veri">Veri Seti</a></li>
+    <li><a href="#model">Model</a></li>
+    <li><a href="#performans">Performans</a></li>
+    <li><a href="#uygulama">Mobil Uygulama</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-badge">
+      <span></span>
+      Derin Öğrenme · Tıbbi Görüntü Analizi
+    </div>
+    <h1>Meme Kanseri<br><em>Histopatoloji</em><br>Tespiti</h1>
+    <p>MobileNetV2 transfer learning modeli ile H&E boyalı doku yamalarından IDC (İnvaziv Duktal Karsinom) tespiti yapan derin öğrenme tabanlı sınıflandırma sistemi.</p>
+    <div class="hero-stats">
+      <div class="stat">
+        <div class="stat-num">277K</div>
+        <div class="stat-label">Görüntü</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">2</div>
+        <div class="stat-label">Sınıf</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">20</div>
+        <div class="stat-label">Epoch</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">TFLite</div>
+        <div class="stat-label">Mobil Format</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SORU 1 — VERİ SETİ -->
+<div id="veri">
+<section class="section fade-up">
+  <div class="section-tag">Soru 1</div>
+  <h2>Veri Seti &<br>Ön İşleme</h2>
+  <p class="section-intro">
+    Kaggle platformundaki Breast Histopathology Images veri seti kullanılmıştır. 
+    Veri seti, 162 hastaya ait H&E boyalı doku kesitlerinden elde edilen 50×50 piksel yamalardan oluşmaktadır.
+  </p>
+
+  <div class="info-grid fade-up">
+    <div class="info-card">
+      <div class="info-card-label">Sağlık Probleminin Tanımı</div>
+      <h3>İnvaziv Duktal Karsinom (IDC)</h3>
+      <p>IDC, meme kanserinin en yaygın alt tipidir ve tüm vakaların %80'ini oluşturur. Patolojik tanı için histopatoloji preparatlarının mikroskobik incelenmesi gerekir. Bu çalışma, bu süreci yapay zeka ile otomatize etmeyi hedeflemektedir.</p>
+    </div>
+    <div class="info-card">
+      <div class="info-card-label">Etik Uygunluk & Kaynak</div>
+      <h3>Kaggle — Paul Mooney</h3>
+      <p>Veri seti Andrew Janowczyk ve Anant Madabhushi tarafından CC0 lisansı ile kamuya açık hale getirilmiştir. Kişisel hasta verisi içermemekte, görüntüler anonimleştirilmiş doku kesitlerinden elde edilmektedir.</p>
+    </div>
+  </div>
+
+  <table class="data-table fade-up">
+    <thead>
+      <tr>
+        <th>Özellik</th>
+        <th>Değer</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>Toplam Görüntü Sayısı</td><td class="highlight">277,524</td></tr>
+      <tr><td>IDC Negatif (Sağlıklı)</td><td>198,738 (%71.6)</td></tr>
+      <tr><td>IDC Pozitif (Kanserli)</td><td>78,786 (%28.4)</td></tr>
+      <tr><td>Görüntü Boyutu</td><td>50 × 50 piksel, RGB</td></tr>
+      <tr><td>Format</td><td>PNG</td></tr>
+      <tr><td>Kaynak Hasta Sayısı</td><td>162 hasta</td></tr>
+      <tr><td>Sınıf Sayısı</td><td>2 (Binary Classification)</td></tr>
+    </tbody>
+  </table>
+
+  <div class="class-bars fade-up">
+    <div class="class-bar">
+      <div class="class-bar-header">
+        <div class="class-bar-label">IDC Negatif — Sağlıklı</div>
+        <div class="class-bar-count" style="color:var(--green)">198,738</div>
+      </div>
+      <div class="bar-track"><div class="bar-fill" style="width:71.6%;background:var(--green)"></div></div>
+    </div>
+    <div class="class-bar">
+      <div class="class-bar-header">
+        <div class="class-bar-label">IDC Pozitif — Kanserli</div>
+        <div class="class-bar-count" style="color:var(--red)">78,786</div>
+      </div>
+      <div class="bar-track"><div class="bar-fill" style="width:28.4%;background:var(--red)"></div></div>
+    </div>
+  </div>
+
+  <div style="margin-top:48px" class="fade-up">
+    <div class="info-card">
+      <div class="info-card-label">Veri Ön İşleme Süreci</div>
+      <h3>Normalizasyon, Augmentation & Stratified Split</h3>
+      <p style="margin-bottom:16px">Veri ön işleme dört aşamada gerçekleştirilmiştir:</p>
+      <table class="data-table">
+        <thead><tr><th>Adım</th><th>Yöntem</th><th>Amaç</th></tr></thead>
+        <tbody>
+          <tr><td>Normalizasyon</td><td>MobileNetV2 preprocess_input [-1,1]</td><td>Model uyumluluğu</td></tr>
+          <tr><td>Veri Bölme</td><td>Stratified Split %70/%15/%15</td><td>Sınıf oranını koruma</td></tr>
+          <tr><td>Augmentation</td><td>±20° döndürme, flip, %10 zoom</td><td>Overfitting önleme</td></tr>
+          <tr><td>Sınıf Dengesi</td><td>class_weight {0:0.70, 1:1.76}</td><td>Dengesiz veri yönetimi</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+</div>
+
+<div class="divider"></div>
+
+<!-- SORU 2 — MODEL -->
+<div id="model">
+<section class="section fade-up">
+  <div class="section-tag">Soru 2</div>
+  <h2>Derin Öğrenme<br>Modeli & Eğitim</h2>
+  <p class="section-intro">
+    Transfer learning yaklaşımıyla MobileNetV2 mimarisi seçilmiştir. 
+    ImageNet ağırlıkları ile önceden eğitilmiş model, histopatoloji görüntülerine fine-tuning ile adapte edilmiştir.
+  </p>
+
+  <div class="model-arch fade-up">
+    <h3>Model Mimarisi</h3>
+    <div class="layers">
+      <div class="layer">
+        <div class="layer-icon" style="background:rgba(21,101,192,0.3)">🧠</div>
+        <div class="layer-info">
+          <h4>MobileNetV2 Base Model</h4>
+          <p>input_shape=(96,96,3) · include_top=False · weights='imagenet' · İlk 100 katman donduruldu</p>
+        </div>
+        <div class="layer-badge">Fine-tuning</div>
+      </div>
+      <div class="layer">
+        <div class="layer-icon" style="background:rgba(0,137,123,0.3)">📊</div>
+        <div class="layer-info">
+          <h4>GlobalAveragePooling2D</h4>
+          <p>Uzamsal boyutları tek vektöre indirgeme</p>
+        </div>
+        <div class="layer-badge">Pooling</div>
+      </div>
+      <div class="layer">
+        <div class="layer-icon" style="background:rgba(255,152,0,0.3)">⚡</div>
+        <div class="layer-info">
+          <h4>BatchNormalization</h4>
+          <p>Eğitimi stabilize etme, iç covariate shift azaltma</p>
+        </div>
+        <div class="layer-badge">Normalization</div>
+      </div>
+      <div class="layer">
+        <div class="layer-icon" style="background:rgba(21,101,192,0.3)">🔗</div>
+        <div class="layer-info">
+          <h4>Dense(128, activation='relu')</h4>
+          <p>128 nöronlu tam bağlı katman · ReLU aktivasyonu</p>
+        </div>
+        <div class="layer-badge">Dense</div>
+      </div>
+      <div class="layer">
+        <div class="layer-icon" style="background:rgba(232,93,74,0.3)">🎲</div>
+        <div class="layer-info">
+          <h4>Dropout(0.4)</h4>
+          <p>%40 dropout ile overfitting önleme</p>
+        </div>
+        <div class="layer-badge">Regularization</div>
+      </div>
+      <div class="layer">
+        <div class="layer-icon" style="background:rgba(46,125,50,0.3)">✅</div>
+        <div class="layer-info">
+          <h4>Dense(1, activation='sigmoid')</h4>
+          <p>Binary sınıflandırma çıkışı · [0,1] olasılık değeri</p>
+        </div>
+        <div class="layer-badge">Output</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="training-cards fade-up">
+    <div class="training-card">
+      <div class="training-card-icon">⚙️</div>
+      <h4>Optimizer</h4>
+      <p>Adam<br><span style="font-size:14px;font-family:'DM Sans'">lr=0.0001</span></p>
+    </div>
+    <div class="training-card">
+      <div class="training-card-icon">📉</div>
+      <h4>Loss Fonksiyonu</h4>
+      <p>Binary<br><span style="font-size:14px;font-family:'DM Sans'">Crossentropy</span></p>
+    </div>
+    <div class="training-card">
+      <div class="training-card-icon">🔄</div>
+      <h4>Epoch Sayısı</h4>
+      <p>20<br><span style="font-size:14px;font-family:'DM Sans'">Epoch</span></p>
+    </div>
+    <div class="training-card">
+      <div class="training-card-icon">📦</div>
+      <h4>Batch Size</h4>
+      <p>32<br><span style="font-size:14px;font-family:'DM Sans'">Görüntü/Batch</span></p>
+    </div>
+    <div class="training-card">
+      <div class="training-card-icon">🖥️</div>
+      <h4>Framework</h4>
+      <p>TensorFlow<br><span style="font-size:14px;font-family:'DM Sans'">Keras API</span></p>
+    </div>
+    <div class="training-card">
+      <div class="training-card-icon">📱</div>
+      <h4>Export Format</h4>
+      <p>TFLite<br><span style="font-size:14px;font-family:'DM Sans'">Optimize Edildi</span></p>
+    </div>
+  </div>
+
+  <div style="margin-top:32px" class="fade-up">
+    <div class="info-card">
+      <div class="info-card-label">Overfitting ile Mücadele</div>
+      <h3>Çoklu Strateji</h3>
+      <table class="data-table" style="margin-top:16px">
+        <thead><tr><th>Teknik</th><th>Parametre</th><th>Etkisi</th></tr></thead>
+        <tbody>
+          <tr><td>Dropout</td><td>rate=0.4</td><td>Nöron ko-adaptasyonunu engeller</td></tr>
+          <tr><td>Data Augmentation</td><td>rotation, flip, zoom</td><td>Yapay veri çeşitliliği sağlar</td></tr>
+          <tr><td>ReduceLROnPlateau</td><td>factor=0.5, patience=2</td><td>Öğrenme hızını dinamik düzenler</td></tr>
+          <tr><td>ModelCheckpoint</td><td>monitor=val_auc</td><td>En iyi model kaydedilir</td></tr>
+          <tr><td>Class Weight</td><td>{0:0.70, 1:1.76}</td><td>Sınıf dengesizliğini giderir</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+</div>
+
+<div class="divider"></div>
+
+<!-- SORU 3 — PERFORMANS -->
+<div id="performans">
+<section class="section fade-up">
+  <div class="section-tag">Soru 3</div>
+  <h2>Model Performansı<br>& Değerlendirme</h2>
+  <p class="section-intro">
+    Sağlık uygulamalarında yanlış negatif (kanserli dokuyu sağlıklı tanımak) kritik hata türüdür. 
+    Bu nedenle Recall ve AUC metrikleri özellikle önem taşımaktadır.
+  </p>
+
+  <div class="metrics-grid fade-up">
+    <div class="metric-card blue">
+      <div class="metric-name">Accuracy</div>
+      <div class="metric-value">%85+</div>
+      <div class="metric-desc">Test seti doğruluğu</div>
+    </div>
+    <div class="metric-card teal">
+      <div class="metric-name">AUC</div>
+      <div class="metric-value">0.90+</div>
+      <div class="metric-desc">ROC altındaki alan</div>
+    </div>
+    <div class="metric-card red">
+      <div class="metric-name">Recall</div>
+      <div class="metric-value">%80+</div>
+      <div class="metric-desc">Kanserli tespit oranı</div>
+    </div>
+    <div class="metric-card green">
+      <div class="metric-name">F1-Score</div>
+      <div class="metric-value">0.80+</div>
+      <div class="metric-desc">Precision-Recall dengesi</div>
+    </div>
+  </div>
+
+  <div class="info-grid fade-up">
+    <div class="info-card">
+      <div class="info-card-label">Klinik Yorum</div>
+      <h3>Yanlış Negatif Analizi</h3>
+      <p>Kanserli bir dokunun sağlıklı olarak sınıflandırılması (yanlış negatif), tedavinin geciktirilmesine yol açabilir. Bu nedenle Recall (Sensitivity) metriği, Precision'dan daha önceliklidir. Model bu dengeyi sağlamak için class_weight ile eğitilmiştir.</p>
+    </div>
+    <div class="info-card">
+      <div class="info-card-label">Performans Metrikleri</div>
+      <h3>Metrik Seçim Gerekçesi</h3>
+      <p>Binary sınıflandırma için Accuracy yanıltıcı olabilir (dengesiz veri). AUC eşik bağımsız genel performansı, F1-Score ise precision-recall dengesini ölçmektedir. Confusion Matrix ile hata türleri analiz edilmiştir.</p>
+    </div>
+  </div>
+
+  <div class="charts-note fade-up">
+    <p>📊 <strong>Eğitim grafikleri, Confusion Matrix ve ROC eğrisi</strong> mobil uygulamanın<br>
+    <strong>"Grafikler"</strong> sekmesinde interaktif olarak görüntülenebilmektedir.</p>
+  </div>
+</section>
+</div>
+
+<div class="divider"></div>
+
+<!-- SORU 4 — MOBİL UYGULAMA -->
+<div id="uygulama">
+<section class="section fade-up">
+  <div class="section-tag">Soru 4</div>
+  <h2>Mobil Uygulama<br>& Model Entegrasyonu</h2>
+  <p class="section-intro">
+    Flutter ile geliştirilen Android uygulaması, eğitilmiş TFLite modelini cihaz üzerinde çalıştırmaktadır. 
+    Kullanıcı görüntü yükler, model anlık tahmin yapar ve sonuç ekranda gösterilir.
+  </p>
+
+  <div class="app-showcase fade-up">
+    <div class="phone-mockup">
+      <div class="phone-screen">
+        <div class="phone-appbar">🔬 Meme Kanseri Tespiti</div>
+        <div class="phone-body">
+          <div class="phone-info-box">ℹ️ Histopatoloji görüntüsü yükleyin.<br>Yapay zeka IDC tespiti yapacaktır.</div>
+          <div class="phone-img-box">🔬</div>
+          <div class="phone-btns">
+            <div class="phone-btn">📷 Galeriden Seç</div>
+            <div class="phone-btn light">📸 Kamera</div>
+          </div>
+          <div class="phone-result">
+            <div class="phone-result-text">✅ IDC NEGATİF</div>
+            <div class="phone-result-sub">Sağlıklı olasılığı: %99.3</div>
+          </div>
+        </div>
+        <div class="phone-nav">
+          <div class="phone-nav-item active">
+            <div class="phone-nav-icon">🏥</div>
+            Tahmin
+          </div>
+          <div class="phone-nav-item">
+            <div class="phone-nav-icon">📊</div>
+            Grafikler
+          </div>
+          <div class="phone-nav-item">
+            <div class="phone-nav-icon">ℹ️</div>
+            Hakkında
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="app-features">
+      <div class="feature-item">
+        <div class="feature-icon">🔍</div>
+        <div class="feature-text">
+          <h4>Anlık Tahmin</h4>
+          <p>TFLite modeli cihaz üzerinde çalışarak internet bağlantısı gerektirmeden anlık tahmin yapar.</p>
+        </div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon">⚠️</div>
+        <div class="feature-text">
+          <h4>Görüntü Doğrulama</h4>
+          <p>Histopatoloji olmayan görüntüler için renk analizi ile uyarı mesajı gösterilir.</p>
+        </div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon">📊</div>
+        <div class="feature-text">
+          <h4>Model Grafikleri</h4>
+          <p>Eğitim grafikleri, Confusion Matrix ve ROC eğrisi uygulama içinde görüntülenebilir.</p>
+        </div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon">📱</div>
+        <div class="feature-text">
+          <h4>3 Sayfalı Navigasyon</h4>
+          <p>Tahmin, Grafikler ve Hakkında sayfaları ile kullanıcı dostu arayüz.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tech-grid fade-up">
+    <div class="tech-card">
+      <div class="tech-card-icon">🐦</div>
+      <h4>Flutter</h4>
+      <p>Cross-platform mobil geliştirme</p>
+    </div>
+    <div class="tech-card">
+      <div class="tech-card-icon">🤖</div>
+      <h4>TFLite</h4>
+      <p>On-device model çalıştırma</p>
+    </div>
+    <div class="tech-card">
+      <div class="tech-card-icon">🧠</div>
+      <h4>MobileNetV2</h4>
+      <p>Transfer learning modeli</p>
+    </div>
+    <div class="tech-card">
+      <div class="tech-card-icon">🐍</div>
+      <h4>TensorFlow</h4>
+      <p>Model eğitimi ve export</p>
+    </div>
+  </div>
+</section>
+</div>
+
+<footer>
+  <p><strong>Meme Kanseri Histopatoloji Tespiti</strong> — Derin Öğrenme Projesi</p>
+  <p style="margin-top:8px">Bu uygulama yalnızca akademik amaçlıdır. Klinik tanı için doktora başvurunuz.</p>
+</footer>
+
+<script>
+  // Scroll animations
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+
+  // Smooth scroll
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+      e.preventDefault();
+      document.querySelector(a.getAttribute('href')).scrollIntoView({ behavior: 'smooth' });
+    });
+  });
+</script>
+</body>
+</html>
